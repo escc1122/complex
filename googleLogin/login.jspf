@@ -1,0 +1,56 @@
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet" type="text/css">
+<script src="https://apis.google.com/js/api:client.js"></script>
+<script>
+function glogin (){
+  var r = '<%=thisURL%>';
+  var auth2;
+  var customBtn = document.getElementById('customBtn');
+  var userAgent=navigator.userAgent;
+  if (userAgent!=undefined){
+    userAgent=userAgent.toLowerCase();
+  }else{
+    userAgent="";
+  }
+  //判斷瀏覽器是否為ios htc , LINE
+  if (userAgent.match('iphone') || userAgent.match('htc') || navigator.userAgent.match('Line')) {
+    customBtn.onclick = function(){
+      location.href="//accounts.google.com/o/oauth2/auth?"+
+          //等同於'profile email'
+          "&scope=https://www.googleapis.com/auth/userinfo.profile+https://www.googleapis.com/auth/userinfo.email"+
+          //自訂參數
+          "&state="+r+
+          //google回傳之後接收網頁
+          "&redirect_uri=http://<%=request.getServerName()%>/googleSignIn"+
+          "&response_type=code"+
+          "&client_id=<%=googleAppId%>";
+    };
+  }else{
+    gapi.load('auth2', function(){
+      // Retrieve the singleton for the GoogleAuth library and set up the client.
+      auth2 = gapi.auth2.init({
+        client_id: '<%=googleAppId%>',
+        cookiepolicy: 'single_host_origin',
+        scope: 'profile email'
+      });
+      attachSignin(customBtn,r);
+    });
+    function attachSignin(element,re) {
+      auth2.attachClickHandler(element, {},
+          function(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            var id_token = googleUser.getAuthResponse().id_token;
+            var id,Email,Name;
+            if (profile){
+              id=profile.getId();
+              Email=profile.getEmail();
+              Name=profile.getName();
+            }
+            //===================成功取得資料處理================
+          }, function(error) {
+            //===================失敗處理========================
+          });
+    }
+  }
+}
+
+</script>
