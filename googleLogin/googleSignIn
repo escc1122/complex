@@ -1,0 +1,74 @@
+import com.google.Google;
+import com.nineder.codec.ContainerURLEncoder;
+import com.shopping99.member.MemberInfo;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLEncoder;
+
+/**
+  負責接受google回傳
+
+*/
+public class googleSignIn extends HttpServlet{
+  protected Logger logger = LoggerFactory.getLogger(this.getClass());
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    doPost(req,resp);
+  }
+  @Override
+  public void doPost(HttpServletRequest request,
+                    HttpServletResponse response)
+      throws ServletException, IOException
+  {
+    String code = request.getParameter("code");
+    String state = request.getParameter("state");
+    Google google = new Google();
+    JSONObject googleToken = null;
+    JSONObject googleIdToken = null;
+    String googleId="";
+    String idToken="";
+    String email="";
+
+    int status=-1;
+    //取得google token
+    try {
+      googleToken = google.getGoogleToken(code,request.getRequestURL().toString());
+      idToken=googleToken.getString("id_token");
+    } catch (JSONException e) {
+      logger.info("取得idToken發生錯誤 : " + e.getStackTrace());
+    }
+
+    //取得google id , email
+    if (idToken!=null && !idToken.equals("")){
+      try {
+        googleIdToken = google.getGoogleIdToken(idToken);
+        googleId = googleIdToken.getString("sub");
+        email = googleIdToken.getString("email");
+      }catch (Exception e){
+        logger.info("取得google id , email 發生錯誤 : " + e.getStackTrace());
+      }
+
+      //利用googleId跟email進行會員帳號驗證
+      if (googleIdToken!=null && !googleId.equals("")){
+        //===============登入驗證==============================
+      }
+
+      //如果驗證成功 就開始登入使用者
+      if (status == 1){
+        //=========================成功處理==========================================
+      }else{
+        //=========================失敗處理==========================================
+      }
+
+    }
+  }
+}
