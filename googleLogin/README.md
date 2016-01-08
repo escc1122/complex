@@ -7,6 +7,5 @@
 google登入點擊按鈕
 
 [googleSignIn](https://github.com/escc1122/complex/blob/master/googleLogin/googleSignIn)
-
 點完登入後負責接收的頁面
 
